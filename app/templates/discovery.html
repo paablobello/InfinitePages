@@ -1,0 +1,46 @@
+<!-- /app/templates/discovery.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="discovery-feed">
+    {% for book in books %}
+        <!-- Mostrar cada libro aquí -->
+        <div class="book">
+            <h2>{{ book['title'] }}</h2>
+            <p>{{ book['content'][:150] }}...</p> <!-- Muestra un resumen de la historia -->
+            <!-- Un enlace o botón para leer la historia completa -->
+            <a href="{{ url_for('discovery.show_feed', book_id=book['id']) }}">Leer más</a>
+            <!-- Más detalles del libro -->
+            <div>
+                <!-- Imaginando que tienes una forma de votar implementada -->
+                <span>Votos: {{ book['votes'] | default(0) }}</span>
+                <button onclick="voteForBook('{{ book['id'] }}')">Votar</button>
+            </div>
+        </div>
+    {% else %}
+        <p>No se han encontrado libros para mostrar.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function voteForBook(bookId) {
+    // Implementa la función de votación aquí.
+    // Esto podría implicar hacer una solicitud AJAX a tu servidor para registrar el voto
+    console.log('Voto para el libro con ID:', bookId);
+    // Ejemplo de AJAX con fetch (deberías tener una ruta de votación en tu servidor)
+    fetch(`/vote_for_book/${bookId}`, { method: 'POST' })
+    .then(response => {
+        if (response.ok) {
+            console.log('Voto registrado');
+        } else {
+            console.error('Error al votar');
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud AJAX', error);
+    });
+}
+</script>
+{% endblock %}

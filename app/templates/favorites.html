@@ -1,0 +1,16 @@
+
+<!-- /app/templates/discovery.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="favorites">
+    <h1>Liked Books</h1>
+    <ul>
+        {% for book in books %}
+            <li>{{ book.title }}</li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endblock %}
+
