@@ -32,7 +32,7 @@ def my_creations():
         ]
 
         try:
-            response = client.chat.completions.create(model="gpt-4-turbo",
+            response = client.chat.completions.create(model="gpt-4o",
             messages=messages,
             max_tokens=int(word_count) + 100,  # Aumentamos el límite de tokens
             temperature=float(get_creativity_temperature(creativity_level)))
