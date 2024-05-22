@@ -1,22 +1,30 @@
 # /app/routes/discovery.py
-from flask import Blueprint, render_template, current_app
+from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash
 from app.models.book import Book
-# from flask_login import login_required  # Quita esto si el feed es público
+from app.models.comment import Comment
+from flask_login import login_required, current_user
 
 discovery = Blueprint('discovery', __name__)
-
-def fetch_published_books_from_redis():
-    # Obtener una lista de IDs de libros publicados almacenados en Redis
-    book_ids = current_app.redis.smembers('published_books')  # Usando un set para libros publicados
-    books = []
-    for book_id in book_ids:
-        book = current_app.redis.hgetall(f'book:{book_id}')
-        if book and book.get('published') == 'True':  # Verifica si el libro está marcado como publicado
-            books.append(book)
-    return books
 
 @discovery.route('/')
 def show_feed():
     published_books = Book.get_published_books()
     return render_template('discovery.html', books=published_books)
 
+@discovery.route('/toggle_favorite/<book_id>', methods=['POST'])
+@login_required
+def toggle_favorite(book_id):
+    user_id = current_user.get_id()
+    Book.toggle_favorite(book_id, user_id)
+    return redirect(url_for('discovery.show_feed'))
+
+@discovery.route('/add_comment/<book_id>', methods=['POST'])
+@login_required
+def add_comment(book_id):
+    text = request.form.get('comment')
+    if text:
+        Comment.add_comment(book_id, current_user.username, text)
+        flash("Comentario añadido con éxito.", "success")
+    else:
+        flash("No se pudo añadir el comentario.", "error")
+    return redirect(url_for('discovery.show_feed'))

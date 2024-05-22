@@ -4,17 +4,33 @@
 {% block content %}
 <div class="discovery-feed">
     {% for book in books %}
-        <!-- Mostrar cada libro aquí -->
-        <div class="book">
+        <div class="book card mb-4 p-4 shadow-lg rounded">
             <h2>{{ book['title'] }}</h2>
-            <p>{{ book['content'][:150] }}...</p> <!-- Muestra un resumen de la historia -->
-            <!-- Un enlace o botón para leer la historia completa -->
-            <a href="{{ url_for('discovery.show_feed', book_id=book['id']) }}">Leer más</a>
-            <!-- Más detalles del libro -->
-            <div>
-                <!-- Imaginando que tienes una forma de votar implementada -->
-                <span>Votos: {{ book['votes'] | default(0) }}</span>
-                <button onclick="voteForBook('{{ book['id'] }}')">Votar</button>
+            <p>{{ book['content'] }}</p> <!-- Muestra todo el texto de la historia -->
+            <div class="book-details">
+                <span>Publicado por: {{ book['username'] }}</span>
+                <!-- Botón de Me gusta -->
+                <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book['id']) }}" style="display: inline;">
+                  <button type="submit" class="like-button {% if book['id'] in user_favorites %}liked{% endif %}" data-book-id="{{ book['id'] }}">
+                    Me gusta
+                  </button>
+                </form>
+
+
+
+            </div>
+            <!-- Sección de comentarios -->
+            <div class="comments-section">
+                <h3>Comentarios</h3>
+                {% for comment in book.comments %}
+                    <div class="comment">
+                        <strong>{{ comment.username }}</strong>: {{ comment.text }}
+                    </div>
+                {% endfor %}
+                <form method="post" action="{{ url_for('discovery.add_comment', book_id=book['id']) }}">
+                    <input type="text" name="comment" placeholder="Añadir un comentario...">
+                    <button type="submit">Comentar</button>
+                </form>
             </div>
         </div>
     {% else %}
@@ -22,25 +38,35 @@
     {% endfor %}
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
-function voteForBook(bookId) {
-    // Implementa la función de votación aquí.
-    // Esto podría implicar hacer una solicitud AJAX a tu servidor para registrar el voto
-    console.log('Voto para el libro con ID:', bookId);
-    // Ejemplo de AJAX con fetch (deberías tener una ruta de votación en tu servidor)
-    fetch(`/vote_for_book/${bookId}`, { method: 'POST' })
-    .then(response => {
-        if (response.ok) {
-            console.log('Voto registrado');
-        } else {
-            console.error('Error al votar');
-        }
-    })
-    .catch(error => {
-        console.error('Error en la solicitud AJAX', error);
+  document.addEventListener('DOMContentLoaded', function () {
+    const likeButtons = document.querySelectorAll('.like-button');
+
+    likeButtons.forEach(button => {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        const isLiked = button.classList.contains('liked');
+        const bookId = button.getAttribute('data-book-id');
+
+        fetch(`/toggle_favorite/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ liked: !isLiked })
+        })
+        .then(response => {
+          if (response.ok) {
+            button.classList.toggle('liked', !isLiked);
+          } else {
+            console.error('Error al actualizar el estado de favorito');
+          }
+        })
+        .catch(error => console.error('Error en la solicitud:', error));
+      });
     });
-}
+  });
 </script>
 {% endblock %}
+

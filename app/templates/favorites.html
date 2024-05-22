@@ -1,16 +1,17 @@
-
-<!-- /app/templates/discovery.html -->
+<!-- /app/templates/favorites.html -->
 {% extends 'base.html' %}
 
 {% block content %}
 <div class="favorites">
-    <h1>Liked Books</h1>
+    <h1>Libros Favoritos</h1>
     <ul>
         {% for book in books %}
-            <li>{{ book.title }}</li>
+            <li>
+                <h3>{{ book.title }}</h3>
+                <p>{{ book.content }}</p>
+                <span>Publicado por: {{ book.username }}</span>
+            </li>
         {% endfor %}
     </ul>
-
 </div>
 {% endblock %}
-
