@@ -83,25 +83,17 @@ input:checked + .slider:before {
 
 /* Estilos para el botón de "Me gusta" */
 .like-button {
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    display: inline-block;
-    font-weight: bold;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  margin-bottom: 10px;
 }
 
 .like-button.liked {
-    background-color: red;
-    color: white;
-}
-
-.like-button:hover {
-    background-color: #ffcccc;
-    color: red;
+  background-color: red;
+  color: white;
 }
 
 /* Asegúrate de que el botón no tenga estilos por defecto */
@@ -114,98 +106,100 @@ input:checked + .slider:before {
 
 /* Estilos para las tarjetas de libro */
 .card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: 0.3s;
-    margin: 10px;
-    border: none;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  margin: 10px;
 }
 
 .card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .card-body {
-    padding: 15px;
-    flex: 1;
+  padding: 15px;
 }
 
 .btn-light img {
-    width: 24px;
+  width: 24px;
 }
 
 .btn-light img:hover {
-    filter: invert(29%) sepia(88%) saturate(4353%) hue-rotate(340deg) brightness(100%) contrast(97%);
+  filter: invert(29%) sepia(88%) saturate(4353%) hue-rotate(340deg) brightness(100%) contrast(97%);
 }
 
 /* Estilos para el contenedor de descubrimiento */
 .discovery-feed {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column; /* Mostrar los libros uno debajo del otro */
+  gap: 20px;
 }
 
-/* Estilos para la sección de comentarios */
-.comments-section {
-    border-top: 1px solid #ddd;
-    padding-top: 1rem;
-    margin-top: 1rem;
+/* Estilos para las imágenes de portada */
+.cover-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
-.comment {
-    font-size: 0.9rem;
-    color: #333;
-    margin-bottom: 0.5rem;
+/* Estilos para el contenedor de creación de libros */
+.creation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.input-group .form-control {
-    border-right: none;
+.creation-container .form-group,
+.creation-container .result-group {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.input-group .input-group-append .btn {
-    border-left: none;
+.creation-container .form-group h2,
+.creation-container .result-group h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
 }
 
-/* Estilos generales */
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
+.creation-container .result-group img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
-.card img {
-    border-radius: 10px 0 0 10px;
-    object-fit: cover;
-    height: 100%;
+.creation-container .result-group p {
+  font-size: 1rem;
+  color: #333;
 }
 
-.card .card-body {
-    display: flex;
-    flex-direction: column;
+.creation-container .form-group label {
+  font-size: 1rem;
+  color: #333;
 }
 
-.book-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
+.creation-container .form-group textarea,
+.creation-container .form-group select,
+.creation-container .form-group input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.book-details span {
-    font-size: 0.9rem;
-    color: #666;
+.creation-container .form-group button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.card-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-}
-
-.card-text {
-    font-size: 1rem;
-    color: #666;
+.creation-container .form-group button:hover {
+  background-color: #0056b3;
 }

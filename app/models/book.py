@@ -1,33 +1,41 @@
-# /app/models/book.py
 import flask
 import uuid
 from app.models.comment import Comment
 
 class Book:
-    def __init__(self, id, title, content, username, published=False):
+    def __init__(self, id, title, content, username, cover_url=None, published=False):
         self.id = id
         self.title = title
         self.content = content
         self.username = username
+        self.cover_url = cover_url
         self.published = published
         self.comments = Comment.get_comments_for_book(self.id)
 
     @staticmethod
-    def add_book(title, content, username):
+    def add_book(title, content, username, cover_url=None):
         book_id = str(uuid.uuid4())
         flask.current_app.redis.hmset(f"book:{book_id}", {
             'title': title,
             'content': content,
             'username': username,
+            'cover_url': cover_url,
             'published': 'False'
         })
-        return Book(book_id, title, content, username, False)
+        return Book(book_id, title, content, username, cover_url, False)
 
     @staticmethod
     def get_book(book_id):
         book_data = flask.current_app.redis.hgetall(f"book:{book_id}")
         if book_data:
-            return Book(book_id, book_data['title'], book_data['content'], book_data['username'], book_data['published'] == 'True')
+            return Book(
+                book_id,
+                book_data['title'],
+                book_data['content'],
+                book_data['username'],
+                book_data.get('cover_url'),
+                book_data['published'] == 'True'
+            )
         return None
 
     @classmethod

@@ -1,58 +1,47 @@
+<!-- /app/templates/discovery.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
-        {% for book in books %}
-        <div class="col-12 mb-4">
-            <div class="card shadow-lg rounded">
-                <div class="row no-gutters">
-                    <div class="col-md-4">
-                        <img src="path_to_placeholder_image.jpg" class="card-img" alt="book cover">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h2 class="card-title">{{ book['title'] }}</h2>
-                            <p class="card-text">{{ book['content'] }}</p>
-                            <div class="book-details d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Publicado por: {{ book['username'] }}</span>
-                                <!-- Botón de Me gusta -->
-                                <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book['id']) }}" style="display: inline;">
-                                    <button type="submit" class="btn btn-link like-button {% if book['id'] in user_favorites %}liked{% endif %}" data-book-id="{{ book['id'] }}">
-                                        <i class="fas fa-heart"></i> Me gusta
-                                    </button>
-                                </form>
-                            </div>
-                            <!-- Sección de comentarios -->
-                            <div class="comments-section mt-4">
-                                <h3 class="h5">Comentarios</h3>
-                                <div class="comments-list">
-                                    {% for comment in book.comments %}
-                                    <div class="comment mb-2">
-                                        <strong>{{ comment.username }}</strong>: {{ comment.text }}
-                                    </div>
-                                    {% endfor %}
+<div class="discovery-feed">
+    {% for book in books %}
+        <div class="book card mb-4 p-4 shadow-lg rounded">
+            <div class="row no-gutters">
+                <div class="col-md-2">
+                    <img src="{{ book.cover_url }}" alt="Book Cover" class="img-fluid mb-4">
+                </div>
+                <div class="col-md-10">
+                    <div class="card-body">
+                        <h2>{{ book['title'] }}</h2>
+                        <p>{{ book['content'] }}</p> <!-- Muestra todo el texto de la historia -->
+                        <div class="book-details">
+                            <span>Publicado por: {{ book['username'] }}</span>
+                            <!-- Botón de Me gusta -->
+                            <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book['id']) }}" style="display: inline;">
+                              <button type="submit" class="like-button {% if book['id'] in user_favorites %}liked{% endif %}" data-book-id="{{ book['id'] }}">
+                                Me gusta
+                              </button>
+                            </form>
+                        </div>
+                        <!-- Sección de comentarios -->
+                        <div class="comments-section">
+                            <h3>Comentarios</h3>
+                            {% for comment in book.comments %}
+                                <div class="comment">
+                                    <strong>{{ comment.username }}</strong>: {{ comment.text }}
                                 </div>
-                                <form method="post" action="{{ url_for('discovery.add_comment', book_id=book['id']) }}" class="mt-3">
-                                    <div class="input-group">
-                                        <input type="text" name="comment" class="form-control" placeholder="Añadir un comentario..." required>
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary">Comentar</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                            {% endfor %}
+                            <form method="post" action="{{ url_for('discovery.add_comment', book_id=book['id']) }}">
+                                <input type="text" name="comment" placeholder="Añadir un comentario...">
+                                <button type="submit">Comentar</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        {% else %}
-        <div class="col-12">
-            <p class="text-center text-muted">No se han encontrado libros para mostrar.</p>
-        </div>
-        {% endfor %}
-    </div>
+    {% else %}
+        <p>No se han encontrado libros para mostrar.</p>
+    {% endfor %}
 </div>
 {% endblock %}
 

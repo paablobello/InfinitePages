@@ -16,6 +16,7 @@ creations = Blueprint('creations', __name__, template_folder='templates')
 def my_creations():
     generated_text = None
     generated_title = None
+    cover_url = None
     books = Book.get_books_by_username(current_user.get_id())
 
     if request.method == 'POST':
@@ -42,18 +43,24 @@ def my_creations():
             generated_title = lines[0]
             generated_text = '\n'.join(lines[1:]).strip()
 
+            # Generar una portada de libro
+            cover_prompt = f"Portada de libro para una historia sobre: {description}. Género: {genre}."
+            cover_response = client.images.generate(prompt=cover_prompt, n=1, size="512x512")
+            cover_url = cover_response.data[0].url
+
         except openai.OpenAIError as e:
             flash(f"Error al generar el libro: {str(e)}", "error")
 
-    return render_template('creations.html', generated_text=generated_text, generated_title=generated_title, books=books)
+    return render_template('creations.html', generated_text=generated_text, generated_title=generated_title, cover_url=cover_url, books=books)
 
 @creations.route('/save_book', methods=['POST'])
 @login_required
 def save_book():
     title = request.form['title']
     content = request.form['content']
+    cover_url = request.form['cover_url']
     user_id = current_user.get_id()
-    book = Book.add_book(title, content, user_id)
+    book = Book.add_book(title, content, user_id, cover_url)
     if book:
         flash("Libro guardado con éxito.", "success")
     else:
