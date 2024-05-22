@@ -1,98 +1,105 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mx-auto p-5">
+<div class="container my-5">
   <!-- Formulario de creación de historias -->
-  <div class="flex flex-wrap -mx-2">
-    <div class="w-full md:w-1/2 px-2 mb-4">
-      <div class="bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-xl mb-4 font-semibold">Generador de cuentos e historias</h2>
-        <form method="post">
-          <label for="description" class="block text-gray-700 font-bold mb-2">Describir la historia*</label>
-          <textarea class="border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="description" name="description" rows="3" placeholder="Describe brevemente tu idea de historia..."></textarea>
-
-          <div class="flex space-x-4 my-4">
-            <div>
-              <label for="genre" class="block text-gray-700 font-bold mb-2">Género</label>
-              <select id="genre" name="genre" class="block appearance-none w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Generador de cuentos e historias</h2>
+          <form method="post">
+            <div class="form-group">
+              <label for="description">Describir la historia*</label>
+              <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe brevemente tu idea de historia..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="genre">Género</label>
+              <select id="genre" name="genre" class="form-control" required>
                 <option value="">Selecciona un género</option>
                 <option value="ficcion">Ficción</option>
                 <option value="no-ficcion">No ficción</option>
               </select>
             </div>
-            <div>
-              <label for="creativity_level" class="block text-gray-700 font-bold mb-2">Nivel de creatividad</label>
-              <select id="creativity_level" name="creativity_level" class="block appearance-none w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <div class="form-group">
+              <label for="creativity_level">Nivel de creatividad</label>
+              <select id="creativity_level" name="creativity_level" class="form-control" required>
                 <option value="">Selecciona un nivel</option>
                 <option value="low">Bajo</option>
                 <option value="medium">Medio</option>
                 <option value="high">Alto</option>
               </select>
             </div>
-          </div>
-
-          <div class="flex space-x-4 my-4">
-            <div>
-              <label for="word_count" class="block text-gray-700 font-bold mb-2">Longitud de la historia</label>
-              <input type="range" id="word_count" name="word_count" min="100" max="1000" value="500" class="w-full">
-              <span id="word_count_value">500 palabras</span>
+            <div class="form-group">
+              <label for="word_count">Longitud de la historia</label>
+              <input type="range" id="word_count" name="word_count" min="100" max="1000" value="500" class="custom-range">
+              <span id="word_count_value" class="form-text">500 palabras</span>
             </div>
-            <div>
-              <label for="language" class="block text-gray-700 font-bold mb-2">Idioma*</label>
-              <select id="language" name="language" class="block appearance-none w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <div class="form-group">
+              <label for="language">Idioma*</label>
+              <select id="language" name="language" class="form-control" required>
                 <option value="es">Español</option>
                 <option value="en">Inglés</option>
               </select>
             </div>
-          </div>
-
-          <button type="submit" name="generate_book" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Generar</button>
-        </form>
+            <button type="submit" name="generate_book" class="btn btn-primary btn-block">Generar</button>
+          </form>
+        </div>
       </div>
     </div>
 
     <!-- Resultados de la generación de historias -->
-    <div class="w-full md:w-1/2 px-2 mb-4">
-      <div class="bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-xl mb-4 font-semibold">Su resultado</h2>
-        {% if generated_text %}
-        <div class="border p-4 rounded-lg" id="resultado">
-            {{ generated_text }}
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Su resultado</h2>
+          {% if generated_text %}
+          <div class="border p-4 rounded-lg" id="resultado">
+              {{ generated_text }}
+          </div>
+          <form method="post" action="{{ url_for('creations.save_book') }}" class="mt-3">
+              <input type="hidden" name="title" value="{{ generated_title }}">
+              <input type="hidden" name="content" value="{{ generated_text }}">
+              <button type="submit" class="btn btn-success btn-block">Guardar</button>
+          </form>
+          {% else %}
+          <div class="border p-4 rounded-lg" id="resultado">
+              <p class="text-muted">Tus resultados generados se mostrarán aquí.</p>
+          </div>
+          {% endif %}
         </div>
-        <form method="post" action="{{ url_for('creations.save_book') }}">
-            <input type="hidden" name="title" value="{{ generated_title }}">
-            <input type="hidden" name="content" value="{{ generated_text }}">
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
-        {% else %}
-        <div class="border p-4 rounded-lg" id="resultado">
-            <p class="text-gray-700">Tus resultados generados se mostrarán aquí.</p>
-        </div>
-        {% endif %}
       </div>
     </div>
   </div>
 
   <!-- Libros generados -->
-  <h2 class="text-xl mb-4 font-semibold">Mis libros generados</h2>
+  <h2 class="text-center mb-4">Mis libros generados</h2>
   {% if books %}
+  <div class="row">
     {% for book in books %}
-      <div class="card mb-4 p-4 shadow-lg rounded">
-        <h3>{{ book.title }}</h3>
-        <p>{{ book.content }}</p> <!-- Muestra todo el contenido -->
-        <form method="post" action="{{ url_for('creations.toggle_publish_book', book_id=book.id) }}" style="display:inline;">
-          <label class="switch">
-            <input type="checkbox" onchange="this.form.submit()" {% if book.published %}checked{% endif %}>
-            <span class="slider round"></span>
-          </label>
-        </form>
-        <form method="post" action="{{ url_for('creations.delete_book', book_id=book.id) }}" style="display:inline;">
-          <button type="submit" class="btn btn-danger">Eliminar</button>
-        </form>
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h3 class="card-title">{{ book.title }}</h3>
+          <p class="card-text">{{ book.content }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <form method="post" action="{{ url_for('creations.toggle_publish_book', book_id=book.id) }}" style="display:inline;">
+              <label class="switch">
+                <input type="checkbox" onchange="this.form.submit()" {% if book.published %}checked{% endif %}>
+                <span class="slider round"></span>
+              </label>
+            </form>
+            <form method="post" action="{{ url_for('creations.delete_book', book_id=book.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
       </div>
+    </div>
     {% endfor %}
+  </div>
   {% else %}
-    <p>No se han generado libros aún.</p>
+  <p class="text-center text-muted">No se han generado libros aún.</p>
   {% endif %}
 </div>
 {% endblock %}
