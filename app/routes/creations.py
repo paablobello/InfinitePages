@@ -10,6 +10,7 @@ from app.models.book import Book
 
 creations = Blueprint('creations', __name__, template_folder='templates')
 
+
 async def fetch_story(session, description, genre, creativity_level, word_count, language):
     messages = [
         {"role": "system", "content": "Eres un asistente de creación de historias."},
