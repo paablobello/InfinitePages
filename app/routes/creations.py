@@ -28,7 +28,7 @@ def my_creations():
 
         messages = [
             {"role": "system", "content": "Eres un asistente de creación de historias."},
-            {"role": "user", "content": f"Crea una historia completa sobre: {description}. La historia debe tener un principio, un desarrollo y un final claro. La longitud aproximada debe ser de {word_count} palabras, pero si hacen falta mas palabras para poder acabar la historia se deben añadir hasat que finalice por completo y acabando con un punto y final. Género: {genre}. Idioma: {language}. Proporciona un título separado."}
+            {"role": "user", "content": f"Crea una historia completa sobre: {description}. La historia debe tener un principio, un desarrollo y un final claro. La longitud aproximada debe ser de {word_count} palabras, pero si hacen falta mas palabras para poder acabar la historia se deben añadir hasta que finalice por completo y acabando con un punto y final. Género: {genre}. Idioma: {language}. Proporciona un título separado sin caracteres especiales como * # / etc."}
         ]
 
         try:
@@ -45,7 +45,7 @@ def my_creations():
 
             # Generar una portada de libro
             cover_prompt = f"Portada de libro para una historia sobre: {description}. Género: {genre}."
-            cover_response = client.images.generate(prompt=cover_prompt, n=1, size="512x512")
+            cover_response = client.images.generate(prompt=cover_prompt, n=1, size="1024x1024")
             cover_url = cover_response.data[0].url
 
         except openai.OpenAIError as e:

@@ -1,47 +1,49 @@
-<!-- /app/templates/discovery.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="discovery-feed">
-    {% for book in books %}
-        <div class="book card mb-4 p-4 shadow-lg rounded">
+<div class="container my-5">
+    <h1 class="text-center mb-5">Libros Publicados</h1>
+    <div class="discovery-feed">
+        {% for book in books %}
+        <div class="book-card card mb-4 shadow-sm">
             <div class="row no-gutters">
-                <div class="col-md-2">
-                    <img src="{{ book.cover_url }}" alt="Book Cover" class="img-fluid mb-4">
+                <div class="col-md-4">
+                    <img src="{{ book.cover_url }}" alt="Book Cover" class="img-fluid rounded-left cover-image">
                 </div>
-                <div class="col-md-10">
-                    <div class="card-body">
-                        <h2>{{ book['title'] }}</h2>
-                        <p>{{ book['content'] }}</p> <!-- Muestra todo el texto de la historia -->
-                        <div class="book-details">
-                            <span>Publicado por: {{ book['username'] }}</span>
-                            <!-- Botón de Me gusta -->
-                            <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book['id']) }}" style="display: inline;">
-                              <button type="submit" class="like-button {% if book['id'] in user_favorites %}liked{% endif %}" data-book-id="{{ book['id'] }}">
-                                Me gusta
-                              </button>
-                            </form>
-                        </div>
+                <div class="col-md-8 d-flex flex-column">
+                    <div class="card-body flex-grow-1">
+                        <h2 class="card-title">{{ book.title }}</h2>
+                        <p class="card-text">{{ book.content }}</p>
+                        <p class="text-muted">Publicado por: {{ book.username }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <!-- Botón de Me gusta -->
+                        <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-outline-danger btn-sm like-button {% if book.id in user_favorites %}liked{% endif %}" data-book-id="{{ book.id }}">
+                                <i class="fas fa-heart"></i> {{ 'Liked' if book.id in user_favorites else 'Like' }}
+                            </button>
+                        </form>
                         <!-- Sección de comentarios -->
-                        <div class="comments-section">
-                            <h3>Comentarios</h3>
+                        <div class="comments-section mt-3">
+                            <h5>Comentarios</h5>
                             {% for comment in book.comments %}
-                                <div class="comment">
-                                    <strong>{{ comment.username }}</strong>: {{ comment.text }}
-                                </div>
+                            <div class="comment p-2 mb-2 rounded bg-light">
+                                <strong>{{ comment.username }}:</strong> {{ comment.text }}
+                            </div>
                             {% endfor %}
-                            <form method="post" action="{{ url_for('discovery.add_comment', book_id=book['id']) }}">
-                                <input type="text" name="comment" placeholder="Añadir un comentario...">
-                                <button type="submit">Comentar</button>
+                            <form method="post" action="{{ url_for('discovery.add_comment', book_id=book.id) }}" class="mt-2">
+                                <input type="text" name="comment" placeholder="Añadir un comentario..." class="form-control form-control-sm">
+                                <button type="submit" class="btn btn-primary btn-sm mt-2">Comentar</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    {% else %}
-        <p>No se han encontrado libros para mostrar.</p>
-    {% endfor %}
+        {% else %}
+        <p class="text-center">Aun no hay ningún libro publicado en el feed.</p>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 
@@ -66,6 +68,7 @@
         .then(response => {
           if (response.ok) {
             button.classList.toggle('liked', !isLiked);
+            button.innerHTML = `<i class="fas fa-heart"></i> ${!isLiked ? 'Liked' : 'Like'}`;
           } else {
             console.error('Error al actualizar el estado de favorito');
           }

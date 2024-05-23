@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User
+import re
 
 auth = Blueprint('auth', __name__)
 
@@ -18,7 +19,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page or url_for('discovery.show_feed'))
         else:
-            flash('Usuario o contraseña incorrecta.')
+            flash('Usuario o contraseña incorrecta.', 'danger')
     return render_template('login.html')
 
 @auth.route('/logout')
@@ -27,17 +28,23 @@ def logout():
     logout_user()
     return redirect(url_for('discovery.show_feed'))
 
-
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        if User.get_user(username) is None:
+
+        if not re.match(r"^[a-zA-Z0-9_]+$", username):
+            flash('El nombre de usuario solo puede contener letras, números y guiones bajos.', 'danger')
+        elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash('Introduce un correo electrónico válido.', 'danger')
+        elif len(password) < 4:
+            flash('La contraseña debe tener al menos 4 caracteres.', 'danger')
+        elif User.get_user(username):
+            flash('El nombre de usuario ya está en uso. Por favor, elige otro.', 'danger')
+        else:
             new_user = User.add_user(username, email, password)
             login_user(new_user, remember=True)
             return redirect(url_for('discovery.show_feed'))
-        else:
-            flash('El usuario ya existe.')
     return render_template('register.html')

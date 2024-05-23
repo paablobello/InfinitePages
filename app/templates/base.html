@@ -9,88 +9,127 @@
     <!-- Tu CSS personalizado -->
     <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
     <!-- Google Fonts para una fuente moderna -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        .sidebar-brand {
+        body {
             font-family: 'Poppins', sans-serif;
-            font-size: 1.5rem;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            background-color: #343a40;
             color: white;
-            text-align: center;
-            margin: 1rem 0;
-        }
-        .bg-dark {
-            background-color: #343a40 !important;
-        }
-        .sidebar-sticky {
+            min-height: 100vh;
+            padding-top: 20px;
             position: fixed;
             top: 0;
-            height: 100%;
-            padding-top: 1rem;
+            left: 0;
+            width: 250px;
+            transition: all 0.3s;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            color: rgba(255, 255, 255, 1);
+            background-color: #495057;
+            border-radius: 4px;
+        }
+        .sidebar .nav-link.active {
+            background-color: #495057;
+            color: white;
+            border-radius: 4px;
+        }
+        .sidebar-brand {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            display: block;
+            text-align: center;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+        .navbar {
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .sidebar a {
+                float: left;
+                text-align: center;
+                width: 100%;
+                padding: 15px;
+            }
+            .sidebar .nav-link.active {
+                margin: 0;
+            }
+            .content {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Menú lateral -->
-            <div class="col-md-2 bg-dark sidebar-sticky">
-                <!-- Aquí irán los enlaces del menú -->
-                <div class="sidebar-brand">
-                    <a href="{{ url_for('discovery.show_feed') }}" style="color: white; text-decoration: none;">InfinitePages</a>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('discovery.show_feed') }}">
-                            <span data-feather="home"></span>
-                            Discover <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('creations.my_creations') }}">
-                            <span data-feather="file"></span>
-                            My Creations
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('favorites.liked_books') }}">
-                            <span data-feather="heart"></span>
-                            Liked Books
-                        </a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                    <!-- Mostrar el nombre del usuario y botón de logout -->
-                    <li class="nav-item">
-                        <a class="nav-link">
-                            <span data-feather="user"></span>
-                            Logeado como: {{ current_user.username }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                            <span data-feather="log-out"></span>
-                            Logout
-                        </a>
-                    </li>
-                    {% else %}
-                    <!-- Mostrar el botón de login si no está autenticado -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">
-                            <span data-feather="log-in"></span>
-                            Login
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-            <!-- Contenido principal -->
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4 offset-md-2">
-                {% block content %}{% endblock %}
-            </main>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <a href="{{ url_for('discovery.show_feed') }}">InfinitePages</a>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'discovery.show_feed' %}active{% endif %}" href="{{ url_for('discovery.show_feed') }}">
+                    <i class="fas fa-home"></i> Discover
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'creations.my_creations' %}active{% endif %}" href="{{ url_for('creations.my_creations') }}">
+                    <i class="fas fa-file-alt"></i> My Creations
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'favorites.liked_books' %}active{% endif %}" href="{{ url_for('favorites.liked_books') }}">
+                    <i class="fas fa-heart"></i> Liked Books
+                </a>
+            </li>
+            {% if current_user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link">
+                    <i class="fas fa-user"></i> Logeado como: {{ current_user.username }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}" href="{{ url_for('auth.login') }}">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="content">
+        <div class="container">
+            {% block content %}{% endblock %}
         </div>
     </div>
     <!-- Bootstrap Bundle con Popper -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.9/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>

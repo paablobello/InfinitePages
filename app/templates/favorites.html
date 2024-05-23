@@ -1,17 +1,62 @@
-<!-- /app/templates/favorites.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="favorites">
-    <h1>Libros Favoritos</h1>
-    <ul>
+<div class="container my-5">
+    <h1 class="text-center mb-5">Libros Favoritos</h1>
+    <div class="favorites-list row">
         {% for book in books %}
-            <li>
-                <h3>{{ book.title }}</h3>
-                <p>{{ book.content }}</p>
-                <span>Publicado por: {{ book.username }}</span>
-            </li>
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="favorite-item card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <img src="{{ book.cover_url }}" alt="Portada del libro" class="cover-image mb-3 rounded">
+                    <h3 class="card-title">{{ book.title }}</h3>
+                    <p class="card-text">{{ book.content }}</p>
+                    <p class="text-muted">Publicado por: {{ book.username }}</p>
+                    <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-danger btn-sm like-button {% if book.id in user_favorites %}liked{% endif %}" data-book-id="{{ book.id }}">
+                            <i class="fas fa-heart"></i> {{ 'Liked' if book.id in user_favorites else 'Like' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+    {% if not books %}
+    <p class="text-center text-muted">No tienes libros favoritos aún.</p>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const likeButtons = document.querySelectorAll('.like-button');
+
+    likeButtons.forEach(button => {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        const isLiked = button.classList.contains('liked');
+        const bookId = button.getAttribute('data-book-id');
+
+        fetch(`/toggle_favorite/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ liked: !isLiked })
+        })
+        .then(response => {
+          if (response.ok) {
+            button.classList.toggle('liked', !isLiked);
+            button.innerHTML = `<i class="fas fa-heart"></i> ${!isLiked ? 'Liked' : 'Like'}`;
+          } else {
+            console.error('Error al actualizar el estado de favorito');
+          }
+        })
+        .catch(error => console.error('Error en la solicitud:', error));
+      });
+    });
+  });
+</script>
 {% endblock %}

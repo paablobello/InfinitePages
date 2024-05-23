@@ -1,28 +1,37 @@
 import flask
 import uuid
+import re
+import time
 from app.models.comment import Comment
 
 class Book:
-    def __init__(self, id, title, content, username, cover_url=None, published=False):
+    def __init__(self, id, title, content, username, cover_url=None, published=False, publish_time=None):
         self.id = id
-        self.title = title
+        self.title = self.clean_title(title)
         self.content = content
         self.username = username
         self.cover_url = cover_url
         self.published = published
+        self.publish_time = publish_time
         self.comments = Comment.get_comments_for_book(self.id)
+
+    @staticmethod
+    def clean_title(title):
+        return re.sub(r'[*/#]', '', title).strip()
 
     @staticmethod
     def add_book(title, content, username, cover_url=None):
         book_id = str(uuid.uuid4())
+        cleaned_title = Book.clean_title(title)
         flask.current_app.redis.hmset(f"book:{book_id}", {
-            'title': title,
+            'title': cleaned_title,
             'content': content,
             'username': username,
             'cover_url': cover_url,
-            'published': 'False'
+            'published': 'False',
+            'publish_time': '0'
         })
-        return Book(book_id, title, content, username, cover_url, False)
+        return Book(book_id, cleaned_title, content, username, cover_url, False)
 
     @staticmethod
     def get_book(book_id):
@@ -34,7 +43,8 @@ class Book:
                 book_data['content'],
                 book_data['username'],
                 book_data.get('cover_url'),
-                book_data['published'] == 'True'
+                book_data['published'] == 'True',
+                book_data.get('publish_time', '0')
             )
         return None
 
@@ -43,20 +53,22 @@ class Book:
         book_keys = flask.current_app.redis.keys(f"book:*")
         books = []
         for book_key in book_keys:
-            book = cls.get_book(book_key.split(":")[1])
-            if book and book.username == username:
-                books.append(book)
+            book_key_str = book_key.decode('utf-8') if isinstance(book_key, bytes) else book_key
+            if not book_key_str.endswith(':comments'):
+                book = cls.get_book(book_key_str.split(":")[1])
+                if book and book.username == username:
+                    books.append(book)
         return books
 
     @staticmethod
     def publish_book(book_id):
         if flask.current_app.redis.exists(f"book:{book_id}"):
-            flask.current_app.redis.hset(f"book:{book_id}", 'published', 'True')
+            flask.current_app.redis.hmset(f"book:{book_id}", {'published': 'True', 'publish_time': str(time.time())})
             flask.current_app.redis.sadd('published_books', book_id)
 
     @staticmethod
     def unpublish_book(book_id):
-        flask.current_app.redis.hset(f"book:{book_id}", 'published', 'False')
+        flask.current_app.redis.hmset(f"book:{book_id}", {'published': 'False', 'publish_time': '0'})
         flask.current_app.redis.srem('published_books', book_id)
 
     @classmethod
@@ -64,9 +76,12 @@ class Book:
         book_keys = flask.current_app.redis.smembers('published_books')
         published_books = []
         for book_key in book_keys:
-            book = cls.get_book(book_key)
+            book_key_str = book_key.decode('utf-8') if isinstance(book_key, bytes) else book_key
+            book = cls.get_book(book_key_str)
             if book and book.published:
                 published_books.append(book)
+        # Ordenar libros por tiempo de publicación en orden descendente (últimos publicados primero)
+        published_books.sort(key=lambda x: float(x.publish_time), reverse=True)
         return published_books
 
     @staticmethod
@@ -82,7 +97,8 @@ class Book:
         favorite_book_ids = flask.current_app.redis.smembers(f"user:{user_id}:favorites")
         favorite_books = []
         for book_id in favorite_book_ids:
-            book = Book.get_book(book_id)
+            book_id_str = book_id.decode('utf-8') if isinstance(book_id, bytes) else book_id
+            book = Book.get_book(book_id_str)
             if book:
                 favorite_books.append(book)
         return favorite_books
@@ -94,5 +110,6 @@ class Book:
         # También elimina todos los comentarios asociados con el libro
         comment_ids = flask.current_app.redis.lrange(f"book:{book_id}:comments", 0, -1)
         for comment_id in comment_ids:
-            flask.current_app.redis.delete(f"comment:{comment_id}")
+            comment_id_str = comment_id.decode('utf-8') if isinstance(comment_id, bytes) else comment_id
+            flask.current_app.redis.delete(f"comment:{comment_id_str}")
         flask.current_app.redis.delete(f"book:{book_id}:comments")
