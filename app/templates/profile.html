@@ -9,25 +9,27 @@
                     <h2 class="text-center">Perfil de Usuario</h2>
                 </div>
                 <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                      {% if messages %}
-                        {% for category, message in messages %}
-                          {% if category in ['profile_error', 'profile_success'] %}
-                            <div class="alert alert-{{ 'danger' if category == 'profile_error' else 'success' }} alert-dismissible fade show" role="alert">
-                              {{ message }}
-                            </div>
+                    <div id="flash-messages">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                          {% if messages %}
+                            {% for category, message in messages %}
+                              {% if category in ['profile_error', 'profile_success'] %}
+                                <div class="alert alert-{{ 'danger' if category == 'profile_error' else 'success' }} alert-dismissible fade show" role="alert">
+                                  {{ message }}
+                                </div>
+                              {% endif %}
+                            {% endfor %}
                           {% endif %}
-                        {% endfor %}
-                      {% endif %}
-                    {% endwith %}
+                        {% endwith %}
+                    </div>
                     <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
                     <p>
-                        <strong>Email:</strong> {{ user.email }}
-                        <button class="btn btn-link p-0" onclick="toggleEmailForm()">
+                        <strong>Email:</strong> <span id="email-display">{{ user.email }}</span>
+                        <button class="btn btn-link p-0" id="edit-email-btn">
                             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                         </button>
                     </p>
-                    <form id="emailForm" method="post" action="{{ url_for('auth.update_email') }}" style="display:none;">
+                    <form id="emailForm" style="display:none;">
                         <div class="form-group">
                             <label for="new_email">Nuevo Correo Electrónico</label>
                             <input type="email" class="form-control" id="new_email" name="new_email" required>
@@ -36,7 +38,7 @@
                     </form>
                     <hr>
                     <h4>Cambiar Contraseña</h4>
-                    <form method="post" action="{{ url_for('auth.change_password') }}">
+                    <form id="passwordForm">
                         <div class="form-group">
                             <label for="current_password">Contraseña Actual</label>
                             <input type="password" class="form-control" id="current_password" name="current_password" required>
@@ -56,13 +58,61 @@
 
 {% block scripts %}
 <script>
-function toggleEmailForm() {
-    const emailForm = document.getElementById('emailForm');
-    if (emailForm.style.display === 'none' || emailForm.style.display === '') {
-        emailForm.style.display = 'block';
-    } else {
-        emailForm.style.display = 'none';
-    }
-}
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('edit-email-btn').addEventListener('click', function () {
+        const emailForm = document.getElementById('emailForm');
+        emailForm.style.display = emailForm.style.display === 'none' || emailForm.style.display === '' ? 'block' : 'none';
+    });
+
+    document.getElementById('emailForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const newEmail = document.getElementById('new_email').value;
+
+        fetch('{{ url_for("auth.update_email") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ new_email: newEmail })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const flashMessages = document.getElementById('flash-messages');
+            flashMessages.innerHTML = `<div class="alert alert-${data.status === 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">${data.message}</div>`;
+
+            if (data.status === 'success') {
+                document.getElementById('email-display').innerText = data.new_email;
+                document.getElementById('emailForm').style.display = 'none';
+                document.getElementById('new_email').value = '';
+            }
+        })
+        .catch(error => console.error('Error al actualizar el email:', error));
+    });
+
+    document.getElementById('passwordForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const currentPassword = document.getElementById('current_password').value;
+        const newPassword = document.getElementById('new_password').value;
+
+        fetch('{{ url_for("auth.change_password") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const flashMessages = document.getElementById('flash-messages');
+            flashMessages.innerHTML = `<div class="alert alert-${data.status === 'success' ? 'success' : 'danger'} alert-dismissible fade show" role="alert">${data.message}</div>`;
+
+            if (data.status === 'success') {
+                document.getElementById('current_password').value = '';
+                document.getElementById('new_password').value = '';
+            }
+        })
+        .catch(error => console.error('Error al actualizar la contraseña:', error));
+    });
+});
 </script>
 {% endblock %}
