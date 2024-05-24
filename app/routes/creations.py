@@ -13,7 +13,15 @@ creations = Blueprint('creations', __name__, template_folder='templates')
 async def fetch_story(session, description, genre, creativity_level, word_count, language):
     messages = [
         {"role": "system", "content": "Eres un asistente de creación de historias."},
-        {"role": "user", "content": f"Crea una historia completa sobre: {description}. La historia debe tener un principio, un desarrollo y un final claro. La longitud aproximada debe ser de {word_count} palabras, pero si hacen falta mas palabras para poder acabar la historia se deben añadir hasta que finalice por completo y acabando con un punto y final. Género: {genre}. Idioma: {language}. Proporciona un título separado sin caracteres especiales como * # / etc."}
+        {"role": "user", "content": f"""
+            Crea una historia completa sobre: {description}.
+            La historia debe tener un principio, un desarrollo y un final claro.
+            La longitud aproximada debe ser de {word_count} palabras, pero si es necesario, puedes añadir más palabras para asegurar que la historia esté completa.
+            Es crucial que la historia tenga un final claro y coherente, y debe terminar con un punto y final.
+            Género: {genre}. 
+            Idioma: {language}.
+            Proporciona un título adecuado para la historia, separado del cuerpo del texto y sin caracteres especiales como * # / etc.
+        """}
     ]
 
     response = await session.post(
