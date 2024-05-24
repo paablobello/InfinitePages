@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 import openai
 from openai import OpenAI
@@ -9,7 +9,6 @@ client = OpenAI(api_key="sk-proj-FEoK1vLr7iiz1CcV0ULFT3BlbkFJ1d7tEH12hcsyTfFbY0J
 from app.models.book import Book
 
 creations = Blueprint('creations', __name__, template_folder='templates')
-
 
 async def fetch_story(session, description, genre, creativity_level, word_count, language):
     messages = [
@@ -107,17 +106,15 @@ def save_book():
 def publish_book(book_id):
     try:
         Book.publish_book(book_id)
-        flash("Libro publicado con éxito.", "success")
+        return jsonify({'status': 'success'})
     except Exception as e:
-        flash(f"No se pudo publicar el libro: {str(e)}", "error")
-    return redirect(url_for('creations.my_creations'))
+        return jsonify({'status': 'error', 'message': str(e)})
 
 @creations.route('/unpublish_book/<book_id>', methods=['POST'])
 @login_required
 def unpublish_book(book_id):
     Book.unpublish_book(book_id)
-    flash("Libro despublicado con éxito.", "info")
-    return redirect(url_for('creations.my_creations'))
+    return jsonify({'status': 'success'})
 
 @creations.route('/delete_book/<book_id>', methods=['POST'])
 @login_required
@@ -125,10 +122,9 @@ def delete_book(book_id):
     book = Book.get_book(book_id)
     if book and book.username == current_user.get_id():
         Book.delete_book(book_id)
-        flash("Libro eliminado con éxito.", "success")
+        return jsonify({'status': 'success'})
     else:
-        flash("No se encontró el libro o no tiene permiso para eliminarlo.", "error")
-    return redirect(url_for('creations.my_creations'))
+        return jsonify({'status': 'error', 'message': 'No se encontró el libro o no tiene permiso para eliminarlo.'})
 
 def get_creativity_temperature(level):
     temperature_map = {'low': 0.3, 'medium': 0.6, 'high': 1.0}
@@ -151,7 +147,6 @@ def toggle_publish_book(book_id):
             Book.unpublish_book(book_id)
         else:
             Book.publish_book(book_id)
-        flash(f"Estado de publicación del libro '{book.title}' actualizado.", "success")
+        return jsonify({'status': 'success', 'published': book.published})
     else:
-        flash("No se encontró el libro.", "error")
-    return redirect(url_for('creations.my_creations'))
+        return jsonify({'status': 'error', 'message': 'No se encontró el libro.'})

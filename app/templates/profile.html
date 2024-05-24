@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Perfil de Usuario</h2>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          {% if category in ['profile_error', 'profile_success'] %}
+                            <div class="alert alert-{{ 'danger' if category == 'profile_error' else 'success' }} alert-dismissible fade show" role="alert">
+                              {{ message }}
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                    <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+                    <p>
+                        <strong>Email:</strong> {{ user.email }}
+                        <button class="btn btn-link p-0" onclick="toggleEmailForm()">
+                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                        </button>
+                    </p>
+                    <form id="emailForm" method="post" action="{{ url_for('auth.update_email') }}" style="display:none;">
+                        <div class="form-group">
+                            <label for="new_email">Nuevo Correo Electrónico</label>
+                            <input type="email" class="form-control" id="new_email" name="new_email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Actualizar Correo</button>
+                    </form>
+                    <hr>
+                    <h4>Cambiar Contraseña</h4>
+                    <form method="post" action="{{ url_for('auth.change_password') }}">
+                        <div class="form-group">
+                            <label for="current_password">Contraseña Actual</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new_password">Nueva Contraseña</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Actualizar Contraseña</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleEmailForm() {
+    const emailForm = document.getElementById('emailForm');
+    if (emailForm.style.display === 'none' || emailForm.style.display === '') {
+        emailForm.style.display = 'block';
+    } else {
+        emailForm.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

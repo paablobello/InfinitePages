@@ -97,12 +97,13 @@
           <h3 class="card-title">{{ book.title }}</h3>
           <p class="card-text">{{ book.content }}</p>
           <div class="d-flex justify-content-between align-items-center">
-            <form method="post" action="{{ url_for('creations.toggle_publish_book', book_id=book.id) }}" style="display:inline;">
+            <div class="switch-wrapper d-flex align-items-center">
               <label class="switch">
-                <input type="checkbox" onchange="this.form.submit()" {% if book.published %}checked{% endif %}>
+                <input type="checkbox" class="publish-switch" data-book-id="{{ book.id }}" {% if book.published %}checked{% endif %}>
                 <span class="slider round"></span>
               </label>
-            </form>
+              <span class="switch-label ml-2">{{ 'Publicado' if book.published else 'No Publicado' }}</span>
+            </div>
             <form method="post" action="{{ url_for('creations.delete_book', book_id=book.id) }}" style="display:inline;">
               <button type="submit" class="btn btn-danger">Eliminar</button>
             </form>
@@ -130,6 +131,62 @@
 
     // Inicializa el texto del span con el valor por defecto
     wordCountValue.innerText = `Longitud seleccionada: ${wordCountInput.value} palabras`;
+
+    // Agrega evento para los switches de publicación
+    const publishSwitches = document.querySelectorAll('.publish-switch');
+    publishSwitches.forEach(switchElement => {
+      const bookId = switchElement.getAttribute('data-book-id');
+      const isPublished = switchElement.checked;
+      const label = switchElement.parentElement.nextElementSibling;
+      label.innerText = isPublished ? 'Publicado' : 'No Publicado';
+
+      switchElement.addEventListener('change', function () {
+        const bookId = switchElement.getAttribute('data-book-id');
+        const isPublished = switchElement.checked;
+
+        fetch(`/creations/toggle_publish_book/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            label.innerText = isPublished ? 'Publicado' : 'No Publicado';
+          } else {
+            console.error(data.message);
+          }
+        })
+        .catch(error => console.error('Error al actualizar el estado de publicación:', error));
+      });
+    });
+
+    // Agrega evento para los botones de eliminar
+    const deleteButtons = document.querySelectorAll('.btn-danger');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        const form = button.closest('form');
+        const bookId = form.getAttribute('action').split('/').pop();
+
+        fetch(`/creations/delete_book/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            form.closest('.col-md-6').remove();
+          } else {
+            console.error(data.message);
+          }
+        })
+        .catch(error => console.error('Error al eliminar el libro:', error));
+      });
+    });
   });
 </script>
 {{ super() }}

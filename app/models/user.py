@@ -1,36 +1,75 @@
 import flask
+import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
 
-
-class User(UserMixin):
-    def __init__(self, username, email, password_hash):
+class User:
+    def __init__(self, id, username, email, password):
+        self.id = id
         self.username = username
         self.email = email
-        self.password_hash = password_hash
+        self.password_hash = password
 
-    @classmethod
-    def get_user(cls, username):
-        user_data = flask.current_app.redis.hgetall(f"user:{username}")
-        if user_data:
-            return cls(user_data['username'], user_data['email'], user_data['password'])
-        return None
-
-    @classmethod
-    def add_user(cls, username, email, password):
-        password_hash = generate_password_hash(password)  # Hashea la contraseña
-        user_data = {
+    @staticmethod
+    def add_user(username, email, password):
+        user_id = str(uuid.uuid4())
+        password_hash = generate_password_hash(password)
+        flask.current_app.redis.hmset(f"user:{user_id}", {
             'username': username,
             'email': email,
-            'password': password_hash  # Almacena la contraseña hasheada
-        }
-        flask.current_app.redis.hmset(f"user:{username}", user_data)
-        return cls(username, email, password_hash)
+            'password': password_hash
+        })
+        return User(user_id, username, email, password_hash)
+
+    @staticmethod
+    def get_user(user_id):
+        user_data = flask.current_app.redis.hgetall(f"user:{user_id}")
+        if user_data:
+            return User(
+                user_id,
+                user_data['username'],
+                user_data['email'],
+                user_data['password']
+            )
+        return None
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # Estos métodos son requeridos por Flask-Login
+    def save(self):
+        flask.current_app.redis.hmset(f"user:{self.id}", {
+            'username': self.username,
+            'email': self.email,
+            'password': self.password_hash
+        })
+
+    @classmethod
+    def update_user(cls, user):
+        user_data = {
+            'username': user.username,
+            'email': user.email,
+            'password': user.password_hash
+        }
+        flask.current_app.redis.hmset(f"user:{user.id}", user_data)
+
+    def update_email(self, new_email):
+        self.email = new_email
+        self.save()
+
+    def update_password(self, new_password):
+        self.password_hash = generate_password_hash(new_password)
+        self.save()
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
     def get_id(self):
-        # Flask-Login utiliza este método para manejar la sesión de usuario
-        return self.username  # Cambiado de self.username a self.email
+        return self.id

@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 <div class="container my-5">
     <h1 class="text-center mb-5">Libros Publicados</h1>
@@ -19,11 +18,9 @@
                     </div>
                     <div class="card-footer">
                         <!-- Botón de Me gusta -->
-                        <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book.id) }}" style="display: inline;">
-                            <button type="submit" class="btn btn-outline-danger btn-sm like-button {% if book.id in user_favorites %}liked{% endif %}" data-book-id="{{ book.id }}">
-                                <i class="fas fa-heart"></i> {{ 'Liked' if book.id in user_favorites else 'Like' }}
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-outline-danger btn-sm like-button {% if book.id in user_favorites %}liked{% endif %}" data-book-id="{{ book.id }}" data-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}">
+                            <i class="fas fa-heart"></i> {{ 'Liked' if book.id in user_favorites else 'Like' }}
+                        </button>
                         <!-- Sección de comentarios -->
                         <div class="comments-section mt-3">
                             <h5>Comentarios</h5>
@@ -32,9 +29,9 @@
                                 <strong>{{ comment.username }}:</strong> {{ comment.text }}
                             </div>
                             {% endfor %}
-                            <form method="post" action="{{ url_for('discovery.add_comment', book_id=book.id) }}" class="mt-2">
-                                <input type="text" name="comment" placeholder="Añadir un comentario..." class="form-control form-control-sm">
-                                <button type="submit" class="btn btn-primary btn-sm mt-2">Comentar</button>
+                            <form class="comment-form mt-2" data-book-id="{{ book.id }}">
+                                <input type="text" name="comment" placeholder="Añadir un comentario..." class="form-control form-control-sm" {% if not current_user.is_authenticated %}disabled{% endif %}>
+                                <button type="submit" class="btn btn-primary btn-sm mt-2" {% if not current_user.is_authenticated %}disabled{% endif %}>Comentar</button>
                             </form>
                         </div>
                     </div>
@@ -56,10 +53,17 @@
     likeButtons.forEach(button => {
       button.addEventListener('click', function (event) {
         event.preventDefault();
+        const isAuthenticated = button.getAttribute('data-authenticated') === 'true';
+
+        if (!isAuthenticated) {
+          alert('Debes iniciar sesión para dar "Like".');
+          return;
+        }
+
         const isLiked = button.classList.contains('liked');
         const bookId = button.getAttribute('data-book-id');
 
-        fetch(`/toggle_favorite/${bookId}`, {
+        fetch(`/discovery/toggle_favorite/${bookId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -75,6 +79,43 @@
           }
         })
         .catch(error => console.error('Error en la solicitud:', error));
+      });
+    });
+
+    const commentForms = document.querySelectorAll('.comment-form');
+
+    commentForms.forEach(form => {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const bookId = form.getAttribute('data-book-id');
+        const commentInput = form.querySelector('input[name="comment"]');
+        const commentText = commentInput.value.trim();
+
+        if (commentText === '') {
+          return;
+        }
+
+        fetch(`/discovery/add_comment/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ comment: commentText })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const commentsSection = form.closest('.comments-section');
+            const newComment = document.createElement('div');
+            newComment.classList.add('comment', 'p-2', 'mb-2', 'rounded', 'bg-light');
+            newComment.innerHTML = `<strong>${data.comment.username}:</strong> ${data.comment.text}`;
+            commentsSection.insertBefore(newComment, form);
+            commentInput.value = '';
+          } else {
+            console.error(data.message);
+          }
+        })
+        .catch(error => console.error('Error al añadir el comentario:', error));
       });
     });
   });

@@ -44,6 +44,16 @@ input:checked + .slider:before {
   transform: translateX(14px);
 }
 
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.switch-label {
+  margin-left: 8px;
+}
+
+
 /* Estilos para el botón de "Me gusta" */
 .like-button {
   display: inline-flex;
@@ -299,4 +309,50 @@ img {
 /* Asegúrate de que todas las imágenes tengan bordes redondeados */
 img {
   border-radius: 15px; /* Aplica bordes redondeados a todas las imágenes */
+}
+
+/* Estilos para el perfil de usuario */
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.card-body h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.form-group label {
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
 }

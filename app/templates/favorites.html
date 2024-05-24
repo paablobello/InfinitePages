@@ -5,18 +5,16 @@
     <h1 class="text-center mb-5">Libros Favoritos</h1>
     <div class="favorites-list row">
         {% for book in books %}
-        <div class="col-md-6 col-lg-4 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4" id="book-{{ book.id }}">
             <div class="favorite-item card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
                     <img src="{{ book.cover_url }}" alt="Portada del libro" class="cover-image mb-3 rounded">
                     <h3 class="card-title">{{ book.title }}</h3>
                     <p class="card-text">{{ book.content }}</p>
                     <p class="text-muted">Publicado por: {{ book.username }}</p>
-                    <form method="post" action="{{ url_for('discovery.toggle_favorite', book_id=book.id) }}" style="display: inline;">
-                        <button type="submit" class="btn btn-outline-danger btn-sm like-button {% if book.id in user_favorites %}liked{% endif %}" data-book-id="{{ book.id }}">
-                            <i class="fas fa-heart"></i> {{ 'Liked' if book.id in user_favorites else 'Like' }}
-                        </button>
-                    </form>
+                    <button class="btn btn-outline-danger btn-sm like-button {% if book.id in user_favorites %}liked{% endif %}" data-book-id="{{ book.id }}" data-toggle-url="{{ url_for('discovery.toggle_favorite', book_id=book.id) }}">
+                        <i class="fas fa-heart"></i> {{ 'Liked' if book.id in user_favorites else 'Like' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -37,9 +35,11 @@
       button.addEventListener('click', function (event) {
         event.preventDefault();
         const isLiked = button.classList.contains('liked');
+        const toggleUrl = button.getAttribute('data-toggle-url');
         const bookId = button.getAttribute('data-book-id');
+        const bookElement = document.getElementById(`book-${bookId}`);
 
-        fetch(`/toggle_favorite/${bookId}`, {
+        fetch(toggleUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -50,6 +50,9 @@
           if (response.ok) {
             button.classList.toggle('liked', !isLiked);
             button.innerHTML = `<i class="fas fa-heart"></i> ${!isLiked ? 'Liked' : 'Like'}`;
+            if (isLiked) {
+              bookElement.remove();
+            }
           } else {
             console.error('Error al actualizar el estado de favorito');
           }

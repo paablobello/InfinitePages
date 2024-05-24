@@ -37,9 +37,15 @@
                         {% with messages = get_flashed_messages(with_categories=true) %}
                           {% if messages %}
                             {% for category, message in messages %}
-                              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                              </div>
+                              {% if category == 'login_error' %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                  {{ message }}
+                                </div>
+                              {% elif category == 'login_success' %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                  {{ message }}
+                                </div>
+                              {% endif %}
                             {% endfor %}
                           {% endif %}
                         {% endwith %}

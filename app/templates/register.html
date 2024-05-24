@@ -37,9 +37,15 @@
                         {% with messages = get_flashed_messages(with_categories=true) %}
                           {% if messages %}
                             {% for category, message in messages %}
-                              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                              </div>
+                              {% if category == 'register_error' %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                  {{ message }}
+                                </div>
+                              {% elif category == 'register_success' %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                  {{ message }}
+                                </div>
+                              {% endif %}
                             {% endfor %}
                           {% endif %}
                         {% endwith %}
@@ -69,6 +75,6 @@
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.9/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.amazonaws.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
