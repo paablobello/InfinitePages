@@ -90,12 +90,12 @@
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'discovery.show_feed' %}active{% endif %}" href="{{ url_for('discovery.show_feed') }}">
-                    <i class="fas fa-home"></i> Discover
+                    <i class="fas fa-home"></i> Feed
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'creations.my_creations' %}active{% endif %}" href="{{ url_for('creations.my_creations') }}">
-                    <i class="fas fa-file-alt"></i> My Creations
+                    <i class="fas fa-file-alt"></i> Generador
                 </a>
             </li>
             <li class="nav-item">
@@ -106,7 +106,7 @@
             {% if current_user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'auth.profile' %}active{% endif %}" href="{{ url_for('auth.profile') }}">
-                    <i class="fas fa-user"></i> Logeado como: {{ current_user.username }}
+                    <i class="fas fa-user"></i> Área Usuario: {{ current_user.username }}
                 </a>
             </li>
             <li class="nav-item">

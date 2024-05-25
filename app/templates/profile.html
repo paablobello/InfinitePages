@@ -4,7 +4,7 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header">
                     <h2 class="text-center">Perfil de Usuario</h2>
                 </div>
@@ -51,6 +51,51 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Dashboard -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Dashboard</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Libros Generados</h3>
+                                    <p class="card-text" id="books-generated">{{ stats.books_generated }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Libros Publicados</h3>
+                                    <p class="card-text" id="books-published">{{ stats.books_published }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Comentarios Recibidos</h3>
+                                    <p class="card-text" id="comments-received">{{ stats.comments_received }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h3 class="card-title">Comentarios Enviados</h3>
+                                    <p class="card-text" id="comments-sent">{{ stats.comments_sent }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Fin del Dashboard -->
+
         </div>
     </div>
 </div>

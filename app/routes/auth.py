@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User
+from app.models.book import Book
+from app.models.comment import Comment
 import re
 
 auth = Blueprint('auth', __name__)
@@ -53,7 +55,14 @@ def register():
 @auth.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', user=current_user)
+    user_id = current_user.get_id()
+    stats = {
+        'books_generated': Book.get_books_count_by_user(user_id),
+        'books_published': Book.get_published_books_count_by_user(user_id),
+        'comments_received': Comment.get_comments_received_count(user_id),
+        'comments_sent': Comment.get_comments_sent_count(user_id)
+    }
+    return render_template('profile.html', user=current_user, stats=stats)
 
 @auth.route('/update_email', methods=['POST'])
 @login_required

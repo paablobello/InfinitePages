@@ -113,3 +113,14 @@ class Book:
             comment_id_str = comment_id.decode('utf-8') if isinstance(comment_id, bytes) else comment_id
             flask.current_app.redis.delete(f"comment:{comment_id_str}")
         flask.current_app.redis.delete(f"book:{book_id}:comments")
+
+    @staticmethod
+    def get_books_count_by_user(user_id):
+        books = Book.get_books_by_username(user_id)
+        return len(books)
+
+    @staticmethod
+    def get_published_books_count_by_user(user_id):
+        books = Book.get_books_by_username(user_id)
+        published_books = [book for book in books if book.published]
+        return len(published_books)

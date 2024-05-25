@@ -36,3 +36,23 @@ class Comment:
                     comment_data['text']
                 ))
         return comments
+
+    @staticmethod
+    def get_comments_received_count(user_id):
+        from app.models.book import Book
+        books = Book.get_books_by_username(user_id)
+        total_comments = 0
+        for book in books:
+            total_comments += len(flask.current_app.redis.lrange(f"book:{book.id}:comments", 0, -1))
+        return total_comments
+
+    @staticmethod
+    def get_comments_sent_count(user_id):
+        comment_keys = flask.current_app.redis.keys(f"comment:*")
+        comments = []
+        for comment_key in comment_keys:
+            comment_key_str = comment_key.decode('utf-8') if isinstance(comment_key, bytes) else comment_key
+            comment_data = flask.current_app.redis.hgetall(comment_key_str)
+            if comment_data and comment_data['username'] == user_id:
+                comments.append(comment_data)
+        return len(comments)
