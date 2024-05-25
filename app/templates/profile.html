@@ -104,11 +104,13 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Mostrar/Ocultar el formulario de cambio de email
     document.getElementById('edit-email-btn').addEventListener('click', function () {
         const emailForm = document.getElementById('emailForm');
         emailForm.style.display = emailForm.style.display === 'none' || emailForm.style.display === '' ? 'block' : 'none';
     });
 
+    // Manejar el envío del formulario de cambio de email
     document.getElementById('emailForm').addEventListener('submit', function (event) {
         event.preventDefault();
         const newEmail = document.getElementById('new_email').value;
@@ -134,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => console.error('Error al actualizar el email:', error));
     });
 
+    // Manejar el envío del formulario de cambio de contraseña
     document.getElementById('passwordForm').addEventListener('submit', function (event) {
         event.preventDefault();
         const currentPassword = document.getElementById('current_password').value;

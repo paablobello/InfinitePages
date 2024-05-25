@@ -5,8 +5,10 @@ from app.models.book import Book
 from app.models.comment import Comment
 import re
 
+# Define un Blueprint para las rutas de autenticación
 auth = Blueprint('auth', __name__)
 
+# Ruta para iniciar sesión
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -24,12 +26,14 @@ def login():
             flash('Usuario o contraseña incorrecta.', 'login_error')
     return render_template('login.html')
 
+# Ruta para cerrar sesión
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('discovery.show_feed'))
 
+# Ruta para registrar un nuevo usuario
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -37,6 +41,7 @@ def register():
         email = request.form['email']
         password = request.form['password']
 
+        # Validaciones básicas de los campos de registro
         if not re.match(r"^[a-zA-Z0-9_]+$", username):
             flash('El nombre de usuario solo puede contener letras, números y guiones bajos.', 'register_error')
         elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
@@ -51,7 +56,7 @@ def register():
             return redirect(url_for('discovery.show_feed'))
     return render_template('register.html')
 
-
+# Ruta para mostrar el perfil del usuario
 @auth.route('/profile')
 @login_required
 def profile():
@@ -64,6 +69,7 @@ def profile():
     }
     return render_template('profile.html', user=current_user, stats=stats)
 
+# Ruta para actualizar el correo electrónico del usuario
 @auth.route('/update_email', methods=['POST'])
 @login_required
 def update_email():
@@ -75,6 +81,7 @@ def update_email():
         user.update_email(new_email)
         return jsonify({'status': 'success', 'message': 'Email actualizado con éxito.', 'new_email': new_email})
 
+# Ruta para cambiar la contraseña del usuario
 @auth.route('/change_password', methods=['POST'])
 @login_required
 def change_password():

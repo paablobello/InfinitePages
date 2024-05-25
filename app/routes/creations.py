@@ -5,11 +5,14 @@ from openai import OpenAI
 import asyncio
 import aiohttp
 
+# Inicializa el cliente OpenAI con la clave de API
 client = OpenAI(api_key="sk-proj-FEoK1vLr7iiz1CcV0ULFT3BlbkFJ1d7tEH12hcsyTfFbY0JQ")
 from app.models.book import Book
 
+# Define un Blueprint para la sección de creaciones
 creations = Blueprint('creations', __name__, template_folder='templates')
 
+# Función asincrónica para obtener una historia generada por OpenAI
 async def fetch_story(session, description, genre, creativity_level, word_count, language):
     messages = [
         {"role": "system", "content": "Eres un asistente de creación de historias."},
@@ -38,6 +41,7 @@ async def fetch_story(session, description, genre, creativity_level, word_count,
     result = await response.json()
     return result['choices'][0]['message']['content'].strip()
 
+# Función asincrónica para generar una portada de libro usando OpenAI
 async def fetch_cover(session, description, genre):
     cover_prompt = f"Portada de libro para una historia sobre: {description}. Género: {genre}."
     response = await session.post(
@@ -54,6 +58,7 @@ async def fetch_cover(session, description, genre):
     result = await response.json()
     return result['data'][0]['url']
 
+# Función que coordina la generación de la historia y la portada
 async def generate_story_and_cover(description, genre, creativity_level, word_count, language):
     async with aiohttp.ClientSession() as session:
         story_task = fetch_story(session, description, genre, creativity_level, word_count, language)
@@ -66,6 +71,7 @@ async def generate_story_and_cover(description, genre, creativity_level, word_co
 
         return generated_text, generated_title, cover_url
 
+# Ruta para la página de creaciones
 @creations.route('/creations', methods=['GET', 'POST'])
 @login_required
 def my_creations():
@@ -88,12 +94,12 @@ def my_creations():
             generated_text, generated_title, cover_url = loop.run_until_complete(
                 generate_story_and_cover(description, genre, creativity_level, word_count, language)
             )
-
         except openai.OpenAIError as e:
             flash(f"Error al generar el libro: {str(e)}", "error")
 
     return render_template('creations.html', generated_text=generated_text, generated_title=generated_title, cover_url=cover_url, books=books)
 
+# Ruta para guardar un libro
 @creations.route('/save_book', methods=['POST'])
 @login_required
 def save_book():
@@ -108,6 +114,7 @@ def save_book():
         flash("Error al guardar el libro", "error")
     return redirect(url_for('creations.my_creations'))
 
+# Ruta para publicar un libro
 @creations.route('/publish_book/<book_id>', methods=['POST'])
 @login_required
 def publish_book(book_id):
@@ -117,12 +124,14 @@ def publish_book(book_id):
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
 
+# Ruta para despublicar un libro
 @creations.route('/unpublish_book/<book_id>', methods=['POST'])
 @login_required
 def unpublish_book(book_id):
     Book.unpublish_book(book_id)
     return jsonify({'status': 'success'})
 
+# Ruta para eliminar un libro
 @creations.route('/delete_book/<book_id>', methods=['POST'])
 @login_required
 def delete_book(book_id):
@@ -133,10 +142,12 @@ def delete_book(book_id):
     else:
         return jsonify({'status': 'error', 'message': 'No se encontró el libro o no tiene permiso para eliminarlo.'})
 
+# Función para obtener la temperatura de creatividad
 def get_creativity_temperature(level):
     temperature_map = {'low': 0.3, 'medium': 0.6, 'high': 1.0}
     return temperature_map.get(level, 0.6)
 
+# Ruta para obtener el contenido completo de una historia
 @creations.route('/get_full_story/<book_id>', methods=['GET'])
 @login_required
 def get_full_story(book_id):
@@ -145,6 +156,7 @@ def get_full_story(book_id):
         return book.content
     return "No autorizado", 403
 
+# Ruta para alternar la publicación de un libro
 @creations.route('/toggle_publish_book/<book_id>', methods=['POST'])
 @login_required
 def toggle_publish_book(book_id):

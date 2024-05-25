@@ -29,16 +29,20 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Selecciona todos los botones de "Like"
     const likeButtons = document.querySelectorAll('.like-button');
 
+    // Añade un event listener a cada botón de "Like"
     likeButtons.forEach(button => {
       button.addEventListener('click', function (event) {
         event.preventDefault();
+        // Verifica si el libro ya está en favoritos
         const isLiked = button.classList.contains('liked');
         const toggleUrl = button.getAttribute('data-toggle-url');
         const bookId = button.getAttribute('data-book-id');
         const bookElement = document.getElementById(`book-${bookId}`);
 
+        // Envía una solicitud POST para cambiar el estado de favorito
         fetch(toggleUrl, {
           method: 'POST',
           headers: {
@@ -48,8 +52,11 @@
         })
         .then(response => {
           if (response.ok) {
+            // Cambia el estado visual del botón y actualiza el texto
             button.classList.toggle('liked', !isLiked);
             button.innerHTML = `<i class="fas fa-heart"></i> ${!isLiked ? 'Liked' : 'Like'}`;
+
+            // Si el libro ya no está en favoritos, elimínalo del DOM
             if (isLiked) {
               bookElement.remove();
             }

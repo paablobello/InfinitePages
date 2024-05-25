@@ -149,6 +149,7 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Actualiza el texto que muestra la longitud seleccionada para la historia
     const wordCountInput = document.getElementById('word_count');
     const wordCountValue = document.getElementById('word_count_value');
 
@@ -159,6 +160,7 @@
     // Inicializa el texto del span con el valor por defecto
     wordCountValue.innerText = `Longitud seleccionada: ${wordCountInput.value} palabras`;
 
+    // Muestra un loader cuando se envía el formulario
     const form = document.getElementById('story-form');
     form.addEventListener('submit', function (event) {
       const loaderWrapper = document.getElementById('loader-wrapper');
@@ -169,7 +171,7 @@
       storyContainer.classList.add('blur');
     });
 
-    // Añadir funcionalidad para el switch de publicación
+    // Añade funcionalidad para el switch de publicación
     const publishSwitches = document.querySelectorAll('.publish-switch');
     publishSwitches.forEach(switchElement => {
       const bookId = switchElement.getAttribute('data-book-id');
@@ -199,6 +201,7 @@
     });
   });
 
+  // Función para confirmar y eliminar un libro
   function confirmDelete(event, bookId) {
     event.preventDefault();
     if (confirm("¿Estás seguro de que deseas eliminar este libro?")) {

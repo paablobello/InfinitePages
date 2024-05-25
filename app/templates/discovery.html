@@ -48,6 +48,7 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Manejar el botón de "Me gusta"
     const likeButtons = document.querySelectorAll('.like-button');
 
     likeButtons.forEach(button => {
@@ -82,6 +83,7 @@
       });
     });
 
+    // Manejar el formulario de comentarios
     const commentForms = document.querySelectorAll('.comment-form');
 
     commentForms.forEach(form => {

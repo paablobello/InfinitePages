@@ -4,6 +4,7 @@ import re
 import time
 from app.models.comment import Comment
 
+# Clase que representa un libro
 class Book:
     def __init__(self, id, title, content, username, cover_url=None, published=False, publish_time=None):
         self.id = id
@@ -15,14 +16,16 @@ class Book:
         self.publish_time = publish_time
         self.comments = Comment.get_comments_for_book(self.id)
 
+    # Método estático para limpiar el título de caracteres no deseados
     @staticmethod
     def clean_title(title):
         return re.sub(r'[*/#]', '', title).strip()
 
+    # Método estático para añadir un nuevo libro
     @staticmethod
     def add_book(title, content, username, cover_url=None):
-        book_id = str(uuid.uuid4())
-        cleaned_title = Book.clean_title(title)
+        book_id = str(uuid.uuid4())  # Genera un ID único para el libro
+        cleaned_title = Book.clean_title(title)  # Limpia el título del libro
         flask.current_app.redis.hmset(f"book:{book_id}", {
             'title': cleaned_title,
             'content': content,
@@ -30,9 +33,10 @@ class Book:
             'cover_url': cover_url,
             'published': 'False',
             'publish_time': '0'
-        })
+        })  # Guarda los datos del libro en Redis
         return Book(book_id, cleaned_title, content, username, cover_url, False)
 
+    # Método estático para obtener un libro por su ID
     @staticmethod
     def get_book(book_id):
         book_data = flask.current_app.redis.hgetall(f"book:{book_id}")
@@ -48,6 +52,7 @@ class Book:
             )
         return None
 
+    # Método de clase para obtener todos los libros de un usuario
     @classmethod
     def get_books_by_username(cls, username):
         book_keys = flask.current_app.redis.keys(f"book:*")
@@ -60,17 +65,20 @@ class Book:
                     books.append(book)
         return books
 
+    # Método estático para publicar un libro
     @staticmethod
     def publish_book(book_id):
         if flask.current_app.redis.exists(f"book:{book_id}"):
             flask.current_app.redis.hmset(f"book:{book_id}", {'published': 'True', 'publish_time': str(time.time())})
             flask.current_app.redis.sadd('published_books', book_id)
 
+    # Método estático para despublicar un libro
     @staticmethod
     def unpublish_book(book_id):
         flask.current_app.redis.hmset(f"book:{book_id}", {'published': 'False', 'publish_time': '0'})
         flask.current_app.redis.srem('published_books', book_id)
 
+    # Método de clase para obtener todos los libros publicados
     @classmethod
     def get_published_books(cls):
         book_keys = flask.current_app.redis.smembers('published_books')
@@ -84,6 +92,7 @@ class Book:
         published_books.sort(key=lambda x: float(x.publish_time), reverse=True)
         return published_books
 
+    # Método estático para alternar el estado de favorito de un libro para un usuario
     @staticmethod
     def toggle_favorite(book_id, user_id):
         favorites_key = f"user:{user_id}:favorites"
@@ -92,6 +101,7 @@ class Book:
         else:
             flask.current_app.redis.sadd(favorites_key, book_id)
 
+    # Método estático para obtener los libros favoritos de un usuario
     @staticmethod
     def get_favorite_books(user_id):
         favorite_book_ids = flask.current_app.redis.smembers(f"user:{user_id}:favorites")
@@ -103,6 +113,7 @@ class Book:
                 favorite_books.append(book)
         return favorite_books
 
+    # Método estático para eliminar un libro
     @staticmethod
     def delete_book(book_id):
         flask.current_app.redis.delete(f"book:{book_id}")
@@ -114,11 +125,13 @@ class Book:
             flask.current_app.redis.delete(f"comment:{comment_id_str}")
         flask.current_app.redis.delete(f"book:{book_id}:comments")
 
+    # Método estático para obtener el número de libros de un usuario
     @staticmethod
     def get_books_count_by_user(user_id):
         books = Book.get_books_by_username(user_id)
         return len(books)
 
+    # Método estático para obtener el número de libros publicados de un usuario
     @staticmethod
     def get_published_books_count_by_user(user_id):
         books = Book.get_books_by_username(user_id)
