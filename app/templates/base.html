@@ -110,7 +110,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                <a class="nav-link" href="#" onclick="confirmLogout(event)">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </li>
@@ -136,6 +136,14 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
       feather.replace()
+
+      function confirmLogout(event) {
+          event.preventDefault(); // Previene la acción predeterminada del enlace
+          var confirmation = confirm("¿Estás seguro de que quieres cerrar sesión?");
+          if (confirmation) {
+              window.location.href = "{{ url_for('auth.logout') }}";
+          }
+      }
     </script>
     {% block scripts %}{% endblock %}
 </body>
