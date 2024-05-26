@@ -1,0 +1,7 @@
+Flask
+Flask-Login
+Jinja2
+Werkzeug
+aiohttp
+openai
+redis
