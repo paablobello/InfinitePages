@@ -17,7 +17,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.get_user(username)
+        user = User.get_user_by_username(username)
         if user and user.check_password(password):
             login_user(user, remember=True)
             next_page = request.args.get('next')
@@ -26,14 +26,12 @@ def login():
             flash('Usuario o contraseña incorrecta.', 'login_error')
     return render_template('login.html')
 
-# Ruta para cerrar sesión
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('discovery.show_feed'))
 
-# Ruta para registrar un nuevo usuario
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -41,14 +39,13 @@ def register():
         email = request.form['email']
         password = request.form['password']
 
-        # Validaciones básicas de los campos de registro
         if not re.match(r"^[a-zA-Z0-9_]+$", username):
             flash('El nombre de usuario solo puede contener letras, números y guiones bajos.', 'register_error')
         elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash('Introduce un correo electrónico válido.', 'register_error')
         elif len(password) < 4:
             flash('La contraseña debe tener al menos 4 caracteres.', 'register_error')
-        elif User.get_user(username):
+        elif User.get_user_by_username(username):
             flash('El nombre de usuario ya está en uso. Por favor, elige otro.', 'register_error')
         else:
             new_user = User.add_user(username, email, password)
@@ -60,12 +57,12 @@ def register():
 @auth.route('/profile')
 @login_required
 def profile():
-    user_id = current_user.get_id()
+    username = current_user.username
     stats = {
-        'books_generated': Book.get_books_count_by_user(user_id),
-        'books_published': Book.get_published_books_count_by_user(user_id),
-        'comments_received': Comment.get_comments_received_count(user_id),
-        'comments_sent': Comment.get_comments_sent_count(user_id)
+        'books_generated': Book.get_books_count_by_user(username),
+        'books_published': Book.get_published_books_count_by_user(username),
+        'comments_received': Comment.get_comments_received_count(username),
+        'comments_sent': Comment.get_comments_sent_count(username)
     }
     return render_template('profile.html', user=current_user, stats=stats)
 

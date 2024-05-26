@@ -21,7 +21,7 @@ def show_feed():
 def add_comment(book_id):
     comment_text = request.json.get('comment')
     if comment_text:
-        comment = Comment.add_comment(book_id, current_user.id, comment_text)  # Añade el comentario a la base de datos
+        comment = Comment.add_comment(book_id, current_user.username, comment_text)  # Usar current_user.username
         return jsonify({
             'status': 'success',
             'comment': {

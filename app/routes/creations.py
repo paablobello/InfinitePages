@@ -78,8 +78,7 @@ def my_creations():
     generated_text = None
     generated_title = None
     cover_url = None
-    books = Book.get_books_by_username(current_user.get_id())
-
+    books = Book.get_books_by_username(current_user.username)  # Usar current_user.username
     if request.method == 'POST':
         description = request.form.get('description', '')
         genre = request.form.get('genre', '')
@@ -106,13 +105,14 @@ def save_book():
     title = request.form['title']
     content = request.form['content']
     cover_url = request.form['cover_url']
-    user_id = current_user.get_id()
-    book = Book.add_book(title, content, user_id, cover_url)
+    username = current_user.username  # Obtener el username del usuario autenticado
+    book = Book.add_book(title, content, username, cover_url)
     if book:
         flash("Libro guardado con éxito.", "success")
     else:
         flash("Error al guardar el libro", "error")
     return redirect(url_for('creations.my_creations'))
+
 
 # Ruta para publicar un libro
 @creations.route('/publish_book/<book_id>', methods=['POST'])
@@ -136,7 +136,7 @@ def unpublish_book(book_id):
 @login_required
 def delete_book(book_id):
     book = Book.get_book(book_id)
-    if book and book.username == current_user.get_id():
+    if book and book.username == current_user.username:
         Book.delete_book(book_id)
         return jsonify({'status': 'success'})
     else:

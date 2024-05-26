@@ -29,7 +29,7 @@ class Book:
         flask.current_app.redis.hmset(f"book:{book_id}", {
             'title': cleaned_title,
             'content': content,
-            'username': username,
+            'username': username,  # Guarda el username en lugar del user_id
             'cover_url': cover_url,
             'published': 'False',
             'publish_time': '0'
@@ -127,13 +127,13 @@ class Book:
 
     # Método estático para obtener el número de libros de un usuario
     @staticmethod
-    def get_books_count_by_user(user_id):
-        books = Book.get_books_by_username(user_id)
+    def get_books_count_by_user(username):
+        books = Book.get_books_by_username(username)
         return len(books)
 
     # Método estático para obtener el número de libros publicados de un usuario
     @staticmethod
-    def get_published_books_count_by_user(user_id):
-        books = Book.get_books_by_username(user_id)
+    def get_published_books_count_by_user(username):
+        books = Book.get_books_by_username(username)
         published_books = [book for book in books if book.published]
         return len(published_books)

@@ -42,9 +42,9 @@ class Comment:
 
     # Método estático para contar los comentarios recibidos por los libros de un usuario
     @staticmethod
-    def get_comments_received_count(user_id):
+    def get_comments_received_count(username):
         from app.models.book import Book
-        books = Book.get_books_by_username(user_id)  # Obtiene los libros del usuario
+        books = Book.get_books_by_username(username)  # Obtiene los libros del usuario
         total_comments = 0
         for book in books:
             total_comments += len(flask.current_app.redis.lrange(f"book:{book.id}:comments", 0, -1))  # Cuenta los comentarios de cada libro
@@ -52,12 +52,12 @@ class Comment:
 
     # Método estático para contar los comentarios enviados por un usuario
     @staticmethod
-    def get_comments_sent_count(user_id):
+    def get_comments_sent_count(username):
         comment_keys = flask.current_app.redis.keys(f"comment:*")  # Obtiene todas las claves de comentarios
         comments = []
         for comment_key in comment_keys:
             comment_key_str = comment_key.decode('utf-8') if isinstance(comment_key, bytes) else comment_key  # Decodifica la clave si es necesario
             comment_data = flask.current_app.redis.hgetall(comment_key_str)  # Obtiene los datos del comentario desde Redis
-            if comment_data and comment_data['username'] == user_id:  # Comprueba si el comentario fue enviado por el usuario
+            if comment_data and comment_data['username'] == username:  # Comprueba si el comentario fue enviado por el usuario
                 comments.append(comment_data)
         return len(comments)  # Devuelve el número de comentarios enviados

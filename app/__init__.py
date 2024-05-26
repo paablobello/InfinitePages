@@ -1,4 +1,3 @@
-# /app/__init__.py
 from flask import Flask, redirect, url_for
 from flask_login import LoginManager
 from .models.user import User
@@ -31,18 +30,15 @@ def create_app():
     app.register_blueprint(creations, url_prefix='/creations')
 
     from .routes.favorites import favorites
-    from .routes.auth import auth
     app.register_blueprint(favorites, url_prefix='/favorites')
 
     from .routes.auth import auth
     app.register_blueprint(auth, url_prefix='/auth')
 
-    # Redirigir la ruta principal a 'discovery'
     @app.route('/')
     def index():
         return redirect(url_for('discovery.show_feed'))
 
-    # Cargar usuario desde Redis
     @login_manager.user_loader
     def load_user(user_id):
         return User.get_user(user_id)

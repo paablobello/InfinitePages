@@ -40,6 +40,7 @@
         <div class="card-body">
           <h2 class="card-title text-center mb-4">Generador de Libros</h2>
           <form id="story-form" method="post">
+            <!-- Campos del formulario -->
             <div class="form-group">
               <label for="description">Describir la historia</label>
               <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe brevemente tu idea de historia..." required></textarea>
@@ -154,11 +155,11 @@
     const wordCountValue = document.getElementById('word_count_value');
 
     wordCountInput.addEventListener('input', () => {
-      wordCountValue.innerText = `Longitud seleccionada: ${wordCountInput.value} palabras`;
+      wordCountValue.innerText = `Longitud aproximada: ${wordCountInput.value} palabras`;
     });
 
     // Inicializa el texto del span con el valor por defecto
-    wordCountValue.innerText = `Longitud seleccionada: ${wordCountInput.value} palabras`;
+    wordCountValue.innerText = `Longitud aproximada: ${wordCountInput.value} palabras`;
 
     // Muestra un loader cuando se envía el formulario
     const form = document.getElementById('story-form');
