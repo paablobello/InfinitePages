@@ -6,7 +6,7 @@ import asyncio
 import aiohttp
 
 # Inicializa el cliente OpenAI con la clave de API
-client = OpenAI(api_key="sk-proj-FEoK1vLr7iiz1CcV0ULFT3BlbkFJ1d7tEH12hcsyTfFbY0JQ")
+client = OpenAI(api_key="tu_clave_api_aqui")
 from app.models.book import Book
 
 # Define un Blueprint para la sección de creaciones
