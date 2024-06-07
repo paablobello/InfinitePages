@@ -35,11 +35,19 @@ Aplicación web diseñada para crear, publicar y descubrir historias. Creada com
     pip install -r requirements.txt
     ```
 
-3. **Ejecuta el servidor Redis:**
+3. **Configura la clave API de OpenAI:**
+
+    Abre el archivo `creations.py` y reemplaza la clave API actual con tu propia clave API de OpenAI:
+
+    ```python
+    client = OpenAI(api_key="tu_clave_api_aqui")
+    ```
+
+4. **Ejecuta el servidor Redis:**
 
     Asegúrate de que el servidor Redis esté ejecutándose en tu máquina local.
 
-4. **Ejecuta la aplicación:**
+5. **Ejecuta la aplicación:**
 
     ```bash
     flask run
@@ -58,3 +66,5 @@ Aplicación web diseñada para crear, publicar y descubrir historias. Creada com
 - **Dashboard:** Visualiza estadísticas como total de historias creadas, publicadas, comentarios recibidos y likes recibidos.
 
 ---
+
+Asegúrate de reemplazar `"tu_clave_api_aqui"` con tu clave API real de OpenAI.
