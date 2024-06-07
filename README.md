@@ -59,11 +59,11 @@ Aplicación web diseñada para crear, publicar y descubrir historias. Creada com
 
 - **Registro y Login de Usuarios:** Autenticación segura para los usuarios.
 - **Gestión de Perfil:** Los usuarios pueden actualizar su correo electrónico y contraseña, y ver estadísticas sobre su actividad.
-- **Generación de Historias:** Genera historias con varios parámetros como género, nivel de creatividad y cantidad de palabras.
+- **Generación de Historias:** Genera historias con IA a partir de varios parámetros como descripción, género, nivel de creatividad y cantidad de palabras.
 - **Publicación:** Publica o despublica historias con un interruptor.
 - **Favoritos:** Marca historias como favoritas para encontrarlas fácilmente más tarde.
 - **Comentarios:** Deja comentarios en las historias.
-- **Dashboard:** Visualiza estadísticas como total de historias creadas, publicadas, comentarios recibidos y likes recibidos.
+- **Dashboard:** Visualiza estadísticas como total de historias creadas, publicadas y comentarios recibidos.
 
 ---
 
