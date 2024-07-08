@@ -1,6 +1,6 @@
 # InfinitePages
 
-Aplicación web diseñada para crear, publicar y descubrir historias. Creada como proyecto final de la asignatura de ALS.
+Aplicación web diseñada para crear, publicar y descubrir historias.
 
 ## Tecnologías Utilizadas
 
